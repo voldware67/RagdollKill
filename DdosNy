@@ -1,0 +1,165 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Perfect Hub",
+    Icon = "door-open", -- lucide icon. optional
+    Author = "by cvoda", -- optional
+})
+
+Window:Tag({
+    Title = "Generic Blood Ragdoll Fighting",
+    Icon = "github",
+    Color = Color3.fromHex("#30ff6a"),
+    Radius = 0, -- from 0 to 13
+})
+
+local Tab = Window:Tab({
+    Title = "Credits",
+    Icon = "box", -- optional
+    Locked = false,
+})
+
+local Section = Tab:Section({ 
+    Title = "Made By cvoda blox",
+})
+
+local Button = Tab:Button({
+    Title = "Discord",
+    Color = Color3.fromHex("#0000FF"), -- paint the button
+    Justify = "Center", -- align items in the center (Center or Between or Left or Right)
+    IconAlign = "Left", -- Left or Right of the text
+    Icon = "thumbs-up", -- removing icon
+    Callback = function()
+        -- ...
+        
+        local link = "https://discord.gg/bZyMGmjqUe"
+
+if setclipboard then
+    setclipboard(link)
+end
+
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Clipboard",
+    Text = "copy",
+    Duration = 3
+})
+        
+    end
+})
+
+local Button = Tab:Button({
+    Title = "YouTube",
+    Color = Color3.fromHex("#FF0000"), -- paint the button
+    Justify = "Center", -- align items in the center (Center or Between or Left or Right)
+    IconAlign = "Left", -- Left or Right of the text
+    Icon = "youtube", -- removing icon
+    Callback = function()
+        -- ...
+        
+        local link = "https://youtube.com/@cvoda_blox?si=0fn72rKeK6X20BDa"
+
+if setclipboard then
+    setclipboard(link)
+end
+
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Clipboard",
+    Text = "copy",
+    Duration = 3
+})
+        
+    end
+})
+
+local Section = Tab:Section({ 
+    Title = "Update : Now uploaded in ScriptBlox Or Rscript",
+})
+
+local Tab = Window:Tab({
+    Title = "Kill",
+    Icon = "shield-ban", -- optional
+    Locked = false,
+})
+
+local toggleState = false
+
+local Toggle = Tab:Toggle({
+    Title = "Kill all Everyone",
+    Desc = "Toggle",
+    Icon = "bird",
+    Type = "Checkbox",
+    Value = false, -- default off
+    Callback = function(state)
+        toggleState = state
+        print("Auto Hit Toggle is " .. tostring(state))
+    end
+})
+
+task.spawn(function()
+    while task.wait() do
+        if toggleState then
+            local player = game.Players.LocalPlayer
+            local weapon = player.Backpack:WaitForChild("Katana")
+            local remote = game.ReplicatedStorage.Assets.Remotes.Hit
+
+            for _, target in pairs(game.Players:GetPlayers()) do
+                if target ~= player then
+                    local humanoid = target.Character and target.Character:FindFirstChild("Humanoid")
+                    if humanoid then
+                        remote:FireServer(weapon, humanoid, 2)
+                    end
+                end
+            end
+        end
+    end
+end)
+
+local toggleState = false
+
+local Toggle = Tab:Toggle({
+    Title = "kill all noob npc",
+    Desc = "Toggle",
+    Icon = "bird",
+    Type = "Checkbox",
+    Value = false, -- default off
+    Callback = function(state)
+        toggleState = state
+        print("Auto Hit NPC Toggle is " .. tostring(state))
+    end
+})
+
+task.spawn(function()
+    while task.wait() do
+        if toggleState then
+            local players = game:GetService("Players")
+            local replicatedStorage = game:GetService("ReplicatedStorage")
+            
+            local katana = players.LocalPlayer:WaitForChild("Backpack"):WaitForChild("Katana")
+            local hitRemote = replicatedStorage:WaitForChild("Assets"):WaitForChild("Remotes"):WaitForChild("Hit")
+            
+            for _, npc in pairs(workspace.Characters:GetChildren()) do
+                if npc.Name:match("^Dummy%d+$") then
+                    local humanoid = npc:FindFirstChild("Humanoid")
+                    if humanoid then
+                        local args = {katana, humanoid, 1}
+                        hitRemote:FireServer(unpack(args))
+                    end
+                end
+            end
+        end
+    end
+end)
+
+local Tab = Window:Tab({
+    Title = "Troll",
+    Icon = "crown", -- optional
+    Locked = false,
+})
+
+local Section = Tab:Section({ 
+    Title = "Sorry this is still not finished we will solve this",
+})
+
+local Section = Tab:Section({ 
+    Title = "Recommend Using Infinite Yield",
+})
