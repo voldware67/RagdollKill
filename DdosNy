@@ -302,7 +302,6 @@ task.spawn(function()
             if target ~= player then
                 local targetHumanoid = target.Character and target.Character:FindFirstChild("Humanoid")
 
-                -- jika target mati → lanjut ke player berikutnya
                 if not targetHumanoid or targetHumanoid.Health <= 0 then
                     currentTargetIndex += 1
                 else
@@ -324,6 +323,134 @@ task.spawn(function()
         end
     end
 end)
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+
+local selectedPlayer = nil
+local grappleToggle = false
+
+local playerList = {}
+for _, plr in pairs(Players:GetPlayers()) do
+    if plr ~= LocalPlayer then
+        table.insert(playerList, plr.Name)
+    end
+end
+
+local Dropdown = Tab:Dropdown({
+    Title = "select player",
+    Values = playerList,
+    Multi = false,
+    Default = nil,
+    Callback = function(value)
+        selectedPlayer = value
+    end
+})
+
+local Toggle = Tab:Toggle({
+    Title = "Grapple to player",
+    Desc = "GrappleHook needed",
+    Value = false,
+    Callback = function(state)
+        grappleToggle = state
+
+        task.spawn(function()
+            while grappleToggle do
+                task.wait(0.3)
+
+                if not selectedPlayer then continue end
+
+                local target = Players:FindFirstChild(selectedPlayer)
+                if not target then continue end
+                if not target.Character then continue end
+                if not target.Character:FindFirstChild("HumanoidRootPart") then continue end
+
+                local tool = LocalPlayer.Backpack:FindFirstChild("GrappleHook")
+                    or (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("GrappleHook"))
+
+                if tool then
+                    tool.Parent = LocalPlayer.Character
+
+                    Mouse.TargetFilter = target.Character
+                    Mouse.Hit = target.Character.HumanoidRootPart.CFrame
+
+                    tool:Activate()
+                end
+            end
+        end)
+    end
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+local flingToggle = false
+local selectedTarget = nil
+
+local function getPlayerList()
+    local list = {"FLING ALL"}
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            table.insert(list, plr.Name)
+        end
+    end
+    return list
+end
+
+local Dropdown = Tab:Dropdown({
+    Title = "Select player",
+    Values = getPlayerList(),
+    Multi = false,
+    Default = nil,
+    Callback = function(value)
+        selectedTarget = value
+    end
+})
+
+local Toggle = Tab:Toggle({
+    Title = "Fling Player",
+    Desc = "Fling player physics",
+    Value = false,
+    Callback = function(state)
+        flingToggle = state
+
+        task.spawn(function()
+            while flingToggle do
+                task.wait()
+
+                local char = LocalPlayer.Character
+                if not char or not char:FindFirstChild("HumanoidRootPart") then continue end
+                local hrp = char.HumanoidRootPart
+
+                local function flingTarget(target)
+                    if target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+                        local thrp = target.Character.HumanoidRootPart
+
+                        hrp.CFrame = thrp.CFrame * CFrame.new(0, 0, -1)
+
+                        hrp.Velocity = Vector3.new(9e7, 9e7, 9e7)
+                        hrp.RotVelocity = Vector3.new(9e7, 9e7, 9e7)
+                    end
+                end
+
+                if selectedTarget == "FLING ALL" then
+                    for _, plr in pairs(Players:GetPlayers()) do
+                        if plr ~= LocalPlayer then
+                            flingTarget(plr)
+                        end
+                    end
+                else
+                    local target = Players:FindFirstChild(selectedTarget)
+                    if target and target ~= LocalPlayer then
+                        flingTarget(target)
+                    end
+                end
+            end
+        end)
+    end
+})
 
 local Section = Tab:Section({ 
     Title = "Recommend Using Infinite Yield",
@@ -422,4 +549,29 @@ local Toggle = Tab:Toggle({
 			end
 		end
 	end
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local godToggle = false
+
+local Toggle = Tab:Toggle({
+    Title = "GodMode",
+    Desc = "Health",
+    Value = false,
+    Callback = function(state)
+        godToggle = state
+
+        task.spawn(function()
+            while godToggle do
+                task.wait(0.1)
+                local char = LocalPlayer.Character
+                if char and char:FindFirstChild("Humanoid") then
+                    local hum = char.Humanoid
+                    hum.Health = hum.MaxHealth
+                end
+            end
+        end)
+    end
 })
